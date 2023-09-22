@@ -52,10 +52,6 @@ void smode_trap_handler(void) {
   if (read_csr(scause) == CAUSE_USER_ECALL) {
     handle_syscall(current->trapframe);
   }
-  else if(read_csr(scause) == CAUSE_ILLEGAL_INSTRUCTION) {
-    handle_illegal_instruction(current->trapframe);
-
-  }
   else {
     sprint("smode_trap_handler(): unexpected scause %p\n", read_csr(scause));
     sprint("            sepc=%p stval=%p\n", read_csr(sepc), read_csr(stval));
