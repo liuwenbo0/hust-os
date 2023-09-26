@@ -40,7 +40,12 @@ elf_status elf_init(elf_ctx *ctx, void *info) {
 
   // load the elf header
   if (elf_fpread(ctx, &ctx->ehdr, sizeof(ctx->ehdr), 0) != sizeof(ctx->ehdr)) return EL_EIO;
-
+  
+  // sprint("shstrndx is %x.\n",&(ctx->ehdr.shstrndx));
+  // sprint("shstrndx is %x.\n",&(ctx->ehdr.shnum));
+  //sprint("shstrndx is %x.\n",ctx->ehdr.shstrndx);
+  // elf_fpread(ctx, &ctx->ehdr, sizeof(ctx->ehdr), ctx->ehdr.shstrndx) 
+  
   // check the signature (magic value) of the elf
   if (ctx->ehdr.magic != ELF_MAGIC) return EL_NOTELF;
 
@@ -137,4 +142,9 @@ void load_bincode_from_host_elf(process *p) {
   spike_file_close( info.f );
 
   sprint("Application program entry point (virtual address): 0x%lx\n", p->trapframe->epc);
+}
+
+void print_backtrace()
+{
+  return ;
 }

@@ -23,7 +23,18 @@ static void handle_syscall(trapframe *tf) {
   // IMPORTANT: return value should be returned to user app, or else, you will encounter
   // problems in later experiments!
   uint64 syscall_num = (tf->regs).a0;
-  (tf->regs).a0 = do_syscall(syscall_num,
+  if(syscall_num ==SYS_user_print_backtrace)
+  {
+       (tf->regs).a0 = do_syscall(syscall_num,
+                        (tf->regs).a1,
+                        *(((uint64 *)((tf->regs).t6) + 7)),
+                        (tf->regs).a3,
+                        (tf->regs).a4,
+                        (tf->regs).a5,
+                        (tf->regs).a6,
+                        (tf->regs).a7);
+  }
+  else {(tf->regs).a0 = do_syscall(syscall_num,
                         (tf->regs).a1,
                         (tf->regs).a2,
                         (tf->regs).a3,
@@ -31,6 +42,7 @@ static void handle_syscall(trapframe *tf) {
                         (tf->regs).a5,
                         (tf->regs).a6,
                         (tf->regs).a7);
+  }
 
 }
 
@@ -61,6 +73,8 @@ void smode_trap_handler(void) {
   assert(current);
   // save user process counter.
   current->trapframe->epc = read_csr(sepc);
+
+  //sprint("the sp is %x\n",current->trapframe->kernel_sp);
 
   // if the cause of trap is syscall from user application.
   // read_csr() and CAUSE_USER_ECALL are macros defined in kernel/riscv.h
