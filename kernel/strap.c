@@ -67,9 +67,10 @@ void handle_user_page_fault(uint64 mcause, uint64 sepc, uint64 stval) {
       // virtual address that causes the page fault.
       //panic( "You need to implement the operations that actually handle the page fault in lab2_3.\n" );
         //uint64 va=stval; ????
+        //ROUNDDOWN(stval,PGSIZE)
         if(stval<USER_STACK_TOP && stval>(USER_STACK_TOP-20*PGSIZE)){
           void* pa = alloc_page();
-          user_vm_map((pagetable_t)current->pagetable, ROUNDDOWN(stval,PGSIZE), PGSIZE, (uint64)pa, prot_to_type(PROT_WRITE | PROT_READ, 1));
+          user_vm_map((pagetable_t)current->pagetable, stval, PGSIZE, (uint64)pa, prot_to_type(PROT_WRITE | PROT_READ, 1));
         }
         else
           panic("In page fault illegal va.\n");
