@@ -66,15 +66,33 @@ void handle_user_page_fault(uint64 mcause, uint64 sepc, uint64 stval) {
       // hint: first allocate a new physical page, and then, maps the new page to the
       // virtual address that causes the page fault.
       //panic( "You need to implement the operations that actually handle the page fault in lab2_3.\n" );
-        //uint64 va=stval; ????
-        //ROUNDDOWN(stval,PGSIZE)
-        if(stval<USER_STACK_TOP && stval>(USER_STACK_TOP-20*PGSIZE)){
+        // {uint64 va=stval; 
+        // if(va<USER_STACK_TOP && va>(USER_STACK_TOP-20*PGSIZE)){
+        //     uint64 first, last;
+        //     pte_t *pte;
+        //     void* pa =NULL;
+
+        //     for (first = ROUNDDOWN(va, PGSIZE), last = ROUNDDOWN(va + PGSIZE - 1, PGSIZE);first <= last; first += PGSIZE) {
+        //         pa = alloc_page();
+        //         if ((pte = page_walk((pagetable_t)current->pagetable, first, 1)) == 0) panic("cannot handle page fault.\n");
+        //         sprint("pa: %lx\n",pa);
+        //         sprint("first: %lx\n",first);
+        //         sprint("pte: %lx\n*pte: %lx\n",pte,*pte);
+        //         if (*pte & PTE_V)
+        //           panic("map_pages fails on mapping va (0x%lx) to pa (0x%lx)", first, pa);
+        //         *pte = PA2PTE(pa) | prot_to_type(PROT_WRITE | PROT_READ, 1) | PTE_V;
+        //     }
+        // }
+        if(stval < USER_STACK_TOP && stval > (USER_STACK_TOP - 20 * STACK_SIZE))
+        {
           void* pa = alloc_page();
-          user_vm_map((pagetable_t)current->pagetable, ROUNDDOWN(stval,PGSIZE), PGSIZE, (uint64)pa, prot_to_type(PROT_WRITE | PROT_READ, 1));
+          user_vm_map((pagetable_t)current->pagetable,ROUNDDOWN(stval,PGSIZE), PGSIZE, (uint64)pa,prot_to_type(PROT_WRITE | PROT_READ, 1));
         }
         else
-          panic("In page fault illegal va.\n");
-        break;
+           panic("In page fault illegal va.\n");
+         break;
+        // }
+      
     default:
       sprint("unknown page fault.\n");
       break;
