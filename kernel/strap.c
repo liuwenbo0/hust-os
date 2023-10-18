@@ -89,7 +89,7 @@ void handle_user_page_fault(uint64 mcause, uint64 sepc, uint64 stval) {
           user_vm_map((pagetable_t)current->pagetable,ROUNDDOWN(stval,PGSIZE), PGSIZE, (uint64)pa,prot_to_type(PROT_WRITE | PROT_READ, 1));
         }
         else
-           panic("In page fault illegal va.\n");
+           panic("this address is not available!");
          break;
         // }
       
