@@ -217,7 +217,8 @@ ssize_t sys_user_unlink(char * vfn){
 
 ssize_t sys_user_rcwd(char *path){
   path = current->pfiles->cwd->name;
-  sprint("%s",path);
+  sprint("%lx\n",path);
+  sprint("cwd: %s\n",path);
   return 0;
    //return (ssize_t)strcpy(path,current->pfiles->cwd->name);
 }
