@@ -101,8 +101,46 @@ ssize_t sys_user_yield() {
 // open file
 //
 ssize_t sys_user_open(char *pathva, int flags) {
+  int relative=0;
+  //sprint("%s\n",pathva);
+  // sprint("relative %d\n",relative);
+  // sprint("%lx\n",user_va_to_pa((pagetable_t)(current->pagetable), pathva));
+  // sprint("%s\n",user_va_to_pa((pagetable_t)(current->pagetable), pathva));
+  if(*(char *)user_va_to_pa((pagetable_t)(current->pagetable), pathva) == '.'){
+    relative++;
+    pathva++;
+  }
+  // sprint("relative %d\n",relative);
+  // sprint("%lx\n",user_va_to_pa((pagetable_t)(current->pagetable), pathva));
+  // sprint("%s\n",user_va_to_pa((pagetable_t)(current->pagetable), pathva));
+  if(*(char *)user_va_to_pa((pagetable_t)(current->pagetable), pathva) == '.'){
+    relative++;
+    pathva++;
+  }
+  // sprint("relative %d\n",relative);
+  // sprint("%lx\n",user_va_to_pa((pagetable_t)(current->pagetable), pathva));
+  // sprint("%s\n",user_va_to_pa((pagetable_t)(current->pagetable), pathva));
   char* pathpa = (char*)user_va_to_pa((pagetable_t)(current->pagetable), pathva);
-  return do_open(pathpa, flags);
+  char resultpath[256];
+
+  if(relative == 0){
+    strcpy(resultpath,pathpa);
+  }else if(relative == 1){
+    strcpy(resultpath,current->pfiles->cwd->name);
+    if(!strcmp(resultpath,"/")) *resultpath=0; //ignore the "/"
+    strcat(resultpath,pathpa);
+  }else{
+    if(current->pfiles->cwd->parent){
+      //sprint("go there");
+      strcpy(resultpath,current->pfiles->cwd->parent->name);
+      if(!strcmp(resultpath,"/")) *resultpath=0; //ignore the "/"
+      strcat(resultpath,pathpa);
+    }else{
+      strcpy(resultpath,"/");
+    }
+  }
+  //sprint("%s\n",resultpath);
+  return do_open(resultpath, flags);
 }
 
 //
@@ -216,15 +254,45 @@ ssize_t sys_user_unlink(char * vfn){
 }
 
 ssize_t sys_user_rcwd(char *path){
-  path = current->pfiles->cwd->name;
-  sprint("%lx\n",path);
-  sprint("cwd: %s\n",path);
+  if((ssize_t)strcpy((char*)user_va_to_pa((pagetable_t)current->pagetable,path),current->pfiles->cwd->name)==0)
+    return -1;
   return 0;
-   //return (ssize_t)strcpy(path,current->pfiles->cwd->name);
 }
 
 ssize_t sys_user_ccwd(char *path){
-  return (ssize_t)strcpy(current->pfiles->cwd->name,path);
+  int relative=0;
+  //sprint("%d\n",relative);
+  if(*(char *)user_va_to_pa((pagetable_t)(current->pagetable), path) == '.'){
+    relative++;
+    path++;
+  }
+  if(*(char *)user_va_to_pa((pagetable_t)(current->pagetable), path) == '.'){
+    relative++;
+    path++;
+  }
+  char resultpath[256];
+  char* pathpa = (char*)user_va_to_pa((pagetable_t)(current->pagetable), path);
+  //sprint("%d\n",relative);
+  if(relative == 0){
+    strcpy(resultpath,pathpa);
+  }else if(relative == 1){
+    strcpy(resultpath,current->pfiles->cwd->name);
+    if(!strcmp(resultpath,"/")) *resultpath=0; //ignore the "/" 
+    strcat(resultpath,pathpa);
+  }else{
+    if(current->pfiles->cwd->parent){
+      //sprint("go there");
+      strcpy(resultpath,current->pfiles->cwd->parent->name);
+      if(!strcmp(resultpath,"/")) *resultpath=0; //ignore the "/"
+      strcat(resultpath,pathpa);
+    }else{
+      strcpy(resultpath,"/");
+    }
+  }
+  //sprint("%s\n",resultpath);
+  if((ssize_t)strcpy(current->pfiles->cwd->name,resultpath)==0) 
+    return -1;
+  return 0;
 }
 //
 // [a0]: the syscall number; [a1] ... [a7]: arguments to the syscalls.
