@@ -10,9 +10,12 @@
 #include "string.h"
 #include "process.h"
 #include "util/functions.h"
-
+#include "elf.h"
 #include "spike_interface/spike_utils.h"
-
+typedef struct elf_info_t {
+  spike_file_t *f;
+  process *p;
+} elf_info;
 //
 // implement the SYS_user_print syscall
 //
@@ -34,19 +37,71 @@ ssize_t sys_user_exit(uint64 code) {
 //
 // implement the SYS_user_backtrace
 //
-ssize_t sys_user_print_backtrace(uint64 times, uint64 fp_tmp) {
+ssize_t sys_user_print_backtrace(uint64 times,uint64 tf_tmp) {
+  //*(((uint64 *)((tf->regs).t6) + 7))
+   trapframe *tf = (trapframe *)tf_tmp;
+   elf_info info;
+   elf_ctx elfloader;
+   info.f=spike_file_open("./obj/app_print_backtrace", O_RDONLY, 0);
+   //sprint("go there\n");
+   //memset(&elfloader,0,sizeof(elfloader));
+   //elf_ctx *ctx=&elfloader;
+   // = (elf_info *)ctx->info;
+   // call spike file utility to load the content of elf file into memory.
+   // spike_file_pread will read the elf file (msg->f) from offset to memory (indicated by
+   // *dest) for nb bytes.
+  //  if(spike_file_pread(msg->f, &ctx->ehdr, sizeof(ctx->ehdr), 0) != sizeof(ctx->ehdr)){
+  //      sprint("read elf_header failed");
+  //  }
+   sprint("t6 point to + 6 s0 %lx\n",(uint64 *)(tf->regs).t6 + 7);
+   sprint("t6 point to + 6 value of s0 %lx\n",*((uint64 *)(tf->regs).t6 + 7));
+   uint64 * p=(uint64 *)*((uint64 *)(tf->regs).t6 + 1);
+   sprint("%lx -> %lx\n",p,*(p+0));
+   sprint("%lx -> %lx\n",p+1,*(p+1));
+   sprint("%lx -> %lx\n",p+2,*(p+1));
+   sprint("%lx -> %lx\n",p+3,*(p+3));
+   sprint("%lx -> %lx\n",p+4,*(p+4));
+   sprint("%lx -> %lx\n",p+5,*(p+5));
+   sprint("%lx -> %lx\n",p+6,*(p+6));
+   sprint("%lx -> %lx\n",p+7,*(p+7));
+   sprint("%lx -> %lx\n",p+8,*(p+8));
+   sprint("%lx -> %lx\n",p+9,*(p+9));
+   sprint("%lx -> %lx\n",p+10,*(p+10));
+   sprint("%lx -> %lx\n",p+11,*(p+11));
+   sprint("%lx -> %lx\n",p+12,*(p+12));
+   sprint("%lx -> %lx\n",p+13,*(p+13));
+   sprint("%lx -> %lx\n",p+14,*(p+14));
+   sprint("%lx -> %lx\n",p+15,*(p+15));
+   sprint("%lx -> %lx\n",p+16,*(p+16));
+   sprint("%lx -> %lx\n",p+17,*(p+17));
+   sprint("%lx -> %lx\n",p+18,*(p+18));
+   sprint("%lx -> %lx\n",p+19,*(p+19));
+   sprint("%lx -> %lx\n",p+20,*(p+20));
+   sprint("%lx -> %lx\n",p+21,*(p+21));
+   sprint("%lx -> %lx\n",p+22,*(p+22));
 
-   uint64* fp=(uint64*)(fp_tmp);
-   //(uint64)fp>(((uint64)fp)&~((1L << 12) - 1))&&
-   while(times > 0)
-   {
-     sprint("the fp = %x\n",fp);
-     sprint("the address of ra = %x\n",(uint64*)(*fp));
-     sprint("the ra = %x\n",*((uint64*)(*fp)));//print return address
-     fp=(uint64*)(*((uint64*)(*fp)-1));//refresh value of frame pointer
-     sprint("the new fp = %x\n",fp);
-     times --;
-   }
+  //  sprint("ra %lx\n",(tf->regs).ra);
+  //  sprint("sp %lx\n",(tf->regs).sp);
+  //  sprint("epc %lx\n",tf->epc);
+  //  sprint("s0(fp) %lx\n",(tf->regs).s0);
+  //  sprint("s0(fp) point %lx\n",*(uint64 *)((tf->regs).s0));
+  //  sprint("t6 %lx\n",(tf->regs).t6);
+  //  sprint("t6 point to + 1 sp %lx\n",(uint64 *)(tf->regs).t6 + 1);
+  //  sprint("t6 point to + 1 value of sp %lx\n",*((uint64 *)(tf->regs).t6 + 1));
+  //  uint64* fp=(uint64 *)(fp_tmp);// change to fp pointer
+  //  sprint("fp = %lx\n",fp);
+  //  uint64 pagetop = ((((fp_tmp - 1)/512))+1)* 512;
+  //  sprint("%lx\n",pagetop);
+  //  while(times > 0 && (uint64)fp < pagetop)
+  //  {
+  //    sprint("%d\n",times);
+  //    sprint("fp point to the ra: %lx\n",fp);
+  //    sprint("the ra = %lx\n",*fp);
+  //    sprint("the content of ra = %lx\n", *(uint64 *)(*fp));
+  //    fp=(uint64 *)(*(fp-1));//refresh value of frame pointer
+  //    sprint("fp is refreshed\n");
+  //    times --;
+  //  }
    return 0;
 }
 //
