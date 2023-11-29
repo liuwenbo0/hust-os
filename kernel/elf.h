@@ -6,14 +6,6 @@
 
 #define MAX_CMDLINE_ARGS 64
 
-#define STT_FUNC  2    //st_info
-#define STB_GLOBAL (1<<4)   //st_info
-
-typedef struct symbol_tab{
-	char name[16];
-	uint64 off;
-} Symbols;
-
 // elf header structure
 typedef struct elf_header_t {
   uint32 magic;
@@ -33,19 +25,6 @@ typedef struct elf_header_t {
   uint16 shstrndx;  /* Section header string table index */
 } elf_header;
 
-typedef struct elf_sect_header_t {
-  uint32 sh_name;		  /* Section name, index in string tbl */
-  uint32 sh_type;		  /* Type of section */
-  uint64 sh_flags;		/* Miscellaneous section attributes */
-  uint64 sh_addr;		  /* Section virtual addr at execution */
-  uint64 sh_offset;		/* Section file offset */
-  uint64 sh_size;		  /* Size of section in bytes */
-  uint32 sh_link;		  /* Index of another section */
-  uint32 sh_info;		  /* Additional section information */
-  uint64 sh_addralign;/* Section alignment */
-  uint64 sh_entsize;	/* Entry size if section holds table */
-} elf_sect_header;
-
 // Program segment header.
 typedef struct elf_prog_header_t {
   uint32 type;   /* Segment type */
@@ -58,15 +37,32 @@ typedef struct elf_prog_header_t {
   uint64 align;  /* Segment alignment */
 } elf_prog_header;
 
-// elf symbol table structure
-typedef struct elf_sym_t {
-  uint32   st_name;
-  uint8    st_info;      /* the type of symbol */
-  uint8    st_other;
-  uint16   st_shndx;
-  uint64   st_value;     // address maybe
-  uint64   st_size;
-} elf_sym;
+// elf section header
+typedef struct elf_sect_header_t{
+    uint32 name;
+    uint32 type;
+    uint64 flags;
+    uint64 addr;
+    uint64 offset;
+    uint64 size;
+    uint32 link;
+    uint32 info;
+    uint64 addralign;
+    uint64 entsize;
+} elf_sect_header;
+
+// compilation units header (in debug line section)
+typedef struct __attribute__((packed)) {
+    uint32 length;
+    uint16 version;
+    uint32 header_length;
+    uint8 min_instruction_length;
+    uint8 default_is_stmt;
+    int8 line_base;
+    uint8 line_range;
+    uint8 opcode_base;
+    uint8 std_opcode_lengths[12];
+} debug_header;
 
 #define ELF_MAGIC 0x464C457FU  // "\x7FELF" in little endian
 #define ELF_PROG_LOAD 1

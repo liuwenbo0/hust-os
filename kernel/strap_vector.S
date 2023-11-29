@@ -40,7 +40,7 @@ smode_trap_vector:
     # jump to smode_trap_handler() that is defined in kernel/trap.c
     jr t0
 
-
+#
 # return from Supervisor mode to User mode, transition is made by using a trapframe,
 # which stores the context of a user application.
 # return_to_user() takes one parameter, i.e., the pointer (a0 register) pointing to a

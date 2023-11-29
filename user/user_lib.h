@@ -4,4 +4,3 @@
 
 int printu(const char *s, ...);
 int exit(int code);
-int print_backtrace(int times); 
