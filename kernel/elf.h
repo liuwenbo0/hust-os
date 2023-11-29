@@ -6,6 +6,14 @@
 
 #define MAX_CMDLINE_ARGS 64
 
+#define STT_FUNC  2    //st_info
+#define STB_GLOBAL (1<<4)   //st_info
+
+typedef struct symbol_tab{
+	char name[16];
+	uint64 off;
+} Symbols;
+
 // elf header structure
 typedef struct elf_header_t {
   uint32 magic;
@@ -25,6 +33,19 @@ typedef struct elf_header_t {
   uint16 shstrndx;  /* Section header string table index */
 } elf_header;
 
+typedef struct elf_sect_header_t {
+  uint32 sh_name;		  /* Section name, index in string tbl */
+  uint32 sh_type;		  /* Type of section */
+  uint64 sh_flags;		/* Miscellaneous section attributes */
+  uint64 sh_addr;		  /* Section virtual addr at execution */
+  uint64 sh_offset;		/* Section file offset */
+  uint64 sh_size;		  /* Size of section in bytes */
+  uint32 sh_link;		  /* Index of another section */
+  uint32 sh_info;		  /* Additional section information */
+  uint64 sh_addralign;/* Section alignment */
+  uint64 sh_entsize;	/* Entry size if section holds table */
+} elf_sect_header;
+
 // Program segment header.
 typedef struct elf_prog_header_t {
   uint32 type;   /* Segment type */
@@ -36,6 +57,16 @@ typedef struct elf_prog_header_t {
   uint64 memsz;  /* Segment size in memory */
   uint64 align;  /* Segment alignment */
 } elf_prog_header;
+
+// elf symbol table structure
+typedef struct elf_sym_t {
+  uint32   st_name;
+  uint8    st_info;      /* the type of symbol */
+  uint8    st_other;
+  uint16   st_shndx;
+  uint64   st_value;     // address maybe
+  uint64   st_size;
+} elf_sym;
 
 #define ELF_MAGIC 0x464C457FU  // "\x7FELF" in little endian
 #define ELF_PROG_LOAD 1

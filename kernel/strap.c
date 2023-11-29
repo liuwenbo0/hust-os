@@ -23,23 +23,7 @@ static void handle_syscall(trapframe *tf) {
   // IMPORTANT: return value should be returned to user app, or else, you will encounter
   // problems in later experiments!
   uint64 syscall_num = (tf->regs).a0;
-  if(syscall_num ==SYS_user_print_backtrace)
-  {
-      //  sprint("t6 addr: %lx\n",&(tf->regs).t6);
-      // sprint("t6 : %lx\n",(tf->regs).t6);
-      //  sprint("s0 addr: %lx\n",(((uint64 *)((tf->regs).t6) + 7)));
-      //  sprint("s0: %lx\n",*(((uint64 *)((tf->regs).t6) + 7)));
-      // sprint("t6 : %lx\n",*(((uint64 *)((tf->regs).t6) + 30)));
-       (tf->regs).a0 = do_syscall(syscall_num,
-                        (tf->regs).a1,
-                        (uint64)tf,
-                        (tf->regs).a3,
-                        (tf->regs).a4,
-                        (tf->regs).a5,
-                        (tf->regs).a6,
-                        (tf->regs).a7);
-  }
-  else {(tf->regs).a0 = do_syscall(syscall_num,
+  (tf->regs).a0 = do_syscall(syscall_num,
                         (tf->regs).a1,
                         (tf->regs).a2,
                         (tf->regs).a3,
@@ -47,8 +31,6 @@ static void handle_syscall(trapframe *tf) {
                         (tf->regs).a5,
                         (tf->regs).a6,
                         (tf->regs).a7);
-  }
-
 }
 
 //
